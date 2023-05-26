@@ -49,6 +49,7 @@ services:
       timeout: 20s
       retries: 3
       start_period: 20s
+
     volumes:
     - type: bind
       source: ./data/minio/
@@ -69,6 +70,7 @@ services:
     environment:
     - MINIO_ROOT_USER=${S3_ACCESS_KEY}
     - MINIO_ROOT_PASSWORD=${S3_SECRET_KEY}
+
     volumes:
     - type: bind
       source: ./etc/minio/setup.py
@@ -81,7 +83,13 @@ services:
     build:
       context: .
       target: minio-setup
-    command: sh -c "if ! [ -f /keys/ssh_host_rsa_key ]; then ssh-keygen -N '' -t rsa -b 4096 -f /keys/ssh_host_rsa_key; fi"
+    command:
+    - sh
+    - -c
+    - if ! [ -f /keys/ssh_host_rsa_key ]; then
+        ssh-keygen -N '' -t rsa -b 4096 -f /keys/ssh_host_rsa_key;
+      fi
+
     volumes:
     - type: bind
       source: ./data/keys
@@ -89,6 +97,7 @@ services:
 
   mosquitto:
     image: eclipse-mosquitto:2
+
     volumes:
     - type: bind
       source: ./etc/mosquitto/
@@ -116,14 +125,20 @@ services:
     container_name: yacht
     restart: unless-stopped
     ports:
-      - 8000:8000
+    - 8000:8000
+
     volumes:
-      - ./data/yacht:/config
-      - /var/run/docker.sock:/var/run/docker.sock
+    - type: bind
+      source: ./data/yacht
+      target: /config
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+
     environment:
-      - PUID=0
-      - PGID=0
-      - COMPOSE_DIR=/compose
+    - PUID=0
+    - PGID=0
+    - COMPOSE_DIR=/compose
 
   registry:
     restart: always
@@ -159,3 +174,25 @@ services:
     - THEME=light
     depends_on:
     - registry
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.whoami.rule=Host(`registry.seguro.eonerc.rwth-aachen.de`)"
+    - "traefik.http.routers.whoami.entrypoints=web"
+
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    ports:
+    - "80:80"
+    - "443:443"
+
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: true
+
+    - type: bind
+      source: ./etc/traefik/traefik.yaml
+      target: /etc/traefik/traefik.yaml
+      read_only: true

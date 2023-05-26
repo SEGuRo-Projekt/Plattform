@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2023 Steffen Vogel, OPAL-RT Germany GmbH
+# SPDX-License-Identifier: Apache-2.0
+
+---
+log:
+  level: DEBUG
+
+api:
+  insecure: true
+
+providers:
+  docker: true
+  exposedbydefault: false
+
+entryPoints:
+  web:
+    address: :80
+
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: steffen.vogel@opal-rt.com
+      storage: /data/acme.json
+      httpChallenge:
+        entryPoint: web
