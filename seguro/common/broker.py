@@ -86,6 +86,11 @@ class BrokerClient:
                 exc,
             )
 
+        self.start_listening()
+
+    def __del__(self):
+        self.stop_listening()
+
     def __on_connect(self, client, userdata, flags, rc):
         self.logger.info("Connected with result code %i", rc)
 
@@ -93,10 +98,23 @@ class BrokerClient:
         self.logger.debug("Receive msg: %s - %s", msg.topic, str(msg.payload))
         self.message_queue.put(msg)
 
-    def subscribe(self, topic):
-        """Subscribe client to given topic."""
+    def subscribe(self, topic, callback=None):
+        """Subscribe client to given topic and registering callback (optional).
+
+        Arguments:
+            topic -- topic that is subscribed
+
+        Optional:
+            callback -- callback func that is called on message reception.
+                        If no callback set, the default __on_message is called
+        """
         self.client.subscribe(topic)
-        self.logger.info("Subscribed to %s", topic)
+
+        if callback:
+            self.client.message_callback_add(topic, callback)
+            self.logger.info(
+                "Subscribed to %s with callback-func %s", topic, callback
+            )
 
     def start_listening(self):
         """Start async listening on subscribed topics."""

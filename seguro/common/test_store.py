@@ -1,14 +1,17 @@
 """
 SPDX-FileCopyrightText: 2023 Steffen Vogel, OPAL-RT Germany GmbH
+SPDX-FileCopyrightText: 2023 Felix Wege, EONERC-ACS, RWTH Aachen University
 SPDX-License-Identifier: Apache-2.0
 """
 
 import os
 import threading
+import pytest
 
 from seguro.common.store import Client, Event, EventType
 
 
+@pytest.mark.store
 def test_store():
     store = Client("pytest-client")
 
@@ -39,6 +42,7 @@ def test_store():
     os.remove("myfile.txt")
 
 
+@pytest.mark.store
 def test_watch():
     store = Client("pytest-client")
 
@@ -64,6 +68,7 @@ def test_watch():
     assert event.filename == filename
 
 
+@pytest.mark.store
 def test_watch_async():
     store = Client("pytest-client")
 

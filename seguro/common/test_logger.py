@@ -6,8 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 import seguro.common.logger
 import logging
 import os
+import pytest
 
 
+@pytest.mark.logger
 def test_file_logger(capsys):
     filepath = os.path.join(
         os.path.dirname(__file__),
@@ -36,6 +38,7 @@ def test_file_logger(capsys):
         os.remove(filepath)
 
 
+@pytest.mark.logger
 def test_store_logger(capsys):
     store_logger = seguro.common.logger.store_logger(logging.DEBUG, "test.log")
     store_logger.error("Test-Error")

@@ -38,3 +38,11 @@ dependencies = {file = ["requirements.txt"]}
 
 [tool.black]
 line-length = 79
+
+[tool.pytest.ini_options]
+markers = [
+  "broker",
+  "store",
+  "logger",
+  "config"
+]
