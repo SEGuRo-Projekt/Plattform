@@ -53,12 +53,10 @@ services:
       --address=":9000"
       --console-address=":9001"
       --certs-dir="/keys/minio"
-      --ftp="address=:2021"
+      --ftp="address=${DOMAIN}:2021"
       --ftp="passive-port-range=30000-40000"
       --sftp="address=:2022"
       --sftp="ssh-private-key=/keys/minio/ssh_host_rsa_key"
-      --ftp="tls-private-key=/keys/minio/private.key"
-      --ftp="tls-public-cert=/keys/minio/public.crt"
       /data
 
     labels:
@@ -265,42 +263,42 @@ services:
       source: mosquitto
       target: /mosquitto/data/
 
-  mosquitto-setup-acl:
-    environment:
-      MQTT_HOST: mosquitto
-      TLS_CACERT: /certs/ca.crt
-      TLS_CERT: /certs/clients/admin.crt
-      TLS_KEY: /keys/clients/admin.key
+  # mosquitto-setup-acl:
+  #   environment:
+  #     MQTT_HOST: mosquitto
+  #     TLS_CACERT: /certs/ca.crt
+  #     TLS_CERT: /certs/clients/admin.crt
+  #     TLS_KEY: /keys/clients/admin.key
 
-    restart: "no"
+  #   restart: "no"
 
-    depends_on:
-      pki-setup:
-        condition: service_completed_successfully
-      mosquitto:
-        condition: service_healthy
+  #   depends_on:
+  #     pki-setup:
+  #       condition: service_completed_successfully
+  #     mosquitto:
+  #       condition: service_healthy
 
-    image: eclipse-mosquitto:2.0.18-openssl
-    user: "mosquitto:mosquitto"
+  #   image: eclipse-mosquitto:2.0.18-openssl
+  #   user: "mosquitto:mosquitto"
 
-    entrypoint: /bin/sh
-    command: /setup-mosquitto-acl.sh
+  #   entrypoint: /bin/sh
+  #   command: /setup-mosquitto-acl.sh
 
-    volumes:
-    - type: volume
-      source: key_clients
-      target: /keys/clients
-      read_only: true
-    - type: volume
-      source: certs
-      target: /certs
-      read_only: true
-    - type: bind
-      source: etc/mosquitto/
-      target: /mosquitto/config/
-    - type: bind
-      source: scripts/setup-mosquitto-acl.sh
-      target: /setup-mosquitto-acl.sh
+  #   volumes:
+  #   - type: volume
+  #     source: key_clients
+  #     target: /keys/clients
+  #     read_only: true
+  #   - type: volume
+  #     source: certs
+  #     target: /certs
+  #     read_only: true
+  #   - type: bind
+  #     source: etc/mosquitto/
+  #     target: /mosquitto/config/
+  #   - type: bind
+  #     source: scripts/setup-mosquitto-acl.sh
+  #     target: /setup-mosquitto-acl.sh
 
   yacht:
     image: selfhostedpro/yacht
