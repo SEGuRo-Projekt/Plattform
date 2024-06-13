@@ -183,7 +183,8 @@ def main() -> int:
     )
 
     b = broker.Client("heartbeat")
-    b.publish(args.topic, json.dumps(get_status()))
+    msg_info = b.publish(args.topic, json.dumps(get_status()))
+    msg_info.wait_for_publish(10)
 
     return 0
 

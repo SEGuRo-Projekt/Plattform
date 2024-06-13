@@ -64,6 +64,8 @@ DNS.14 = tsa.localhost
 # For platform internal communication only
 DNS.15 = minio
 DNS.16 = mosquitto
+
+IP.1 = 127.0.0.1
 EOF
 
   openssl req \
